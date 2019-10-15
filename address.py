@@ -1,0 +1,25 @@
+import hashlib
+
+# Helper function to determine if a key falls within a range
+def inrange(c, a, b):
+  # is c in [a,b)?, if a == b then it assumes a full circle
+  # on the DHT, so it returns True.
+  pass
+
+class Address(object):
+  def __init__(self, ip, port=9999):
+    self.ip = ip
+    self.port = int(port)
+
+  def __hash__(self):
+    # return hashlib.sha1(("%s:%s" % (self.ip, self.port)).encode()) % SIZE
+    return hashlib.sha1(("%s:%s" % (self.ip, self.port)).encode())
+
+  def __cmp__(self, other):
+    return other.__hash__() < self.__hash__()
+
+  def __eq__(self, other):
+    return other.__hash__() == self.__hash__()
+
+  def __str__(self):
+    return "[\"%s\", %s]" % (self.ip, self.port)
