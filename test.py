@@ -1,23 +1,19 @@
 #!/bin/python
 from node import Node
+from remote import Remote
 from address import Address
+from env import *
 
-# m-bit hash, 2^3 = 8 slots
-m = 3
+m = M_BIT
 
+address = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
 
-# the rest slots are blank
-gap = 3
+ring = Remote(address)
 
-# create an initial node and add it to the Chord ring
-node = Node(Address("127.0.0.1"))
+ring.printNodes()
 
-nodes = [node]
-address = ["127.0.0.2", "127.0.0.3", "127.0.0.4"]
+# def printEverySuccessor():
+#   while x in range(len(nodes)):
+#     print(nodes[x].successor())
 
-i = 0
-for x in range(0, 2 ** m, gap):
-  nodes.append(Node(Address(address[i])))
-  i += 1
-
-print(nodes[1])
+# printEverySuccessor()
