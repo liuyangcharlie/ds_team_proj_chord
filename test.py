@@ -1,6 +1,6 @@
 #!/bin/python
 from node import Node
-from remote import Remote
+from remote import RemoteConnection
 from address import Address
 from env import *
 
@@ -8,7 +8,9 @@ m = M_BIT
 
 address = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
 
-ring = Remote(address)
+ring = RemoteConnection(address)
+
+ring.addNode("127.0.0.5", "127.0.0.1")
 
 ring.printNodes()
 
