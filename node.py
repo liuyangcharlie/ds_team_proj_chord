@@ -1,6 +1,7 @@
 #!/bin/python
 import sys
 import random
+import math
 
 from env import *
 from address import inrange
@@ -10,7 +11,7 @@ from finger_entry import FingerEntry
 class Node(object):
   def __init__(self, local_address, remote, remote_address = None):
     self._address = local_address
-    print("self id = %s", self.id())
+    # print("self id = ", self.id())
     
     # communication with other node via _remote
     self._remote = remote
@@ -69,21 +70,16 @@ class Node(object):
     if remote_address:
       # 1) add to a node `n`, n.find_successor(`to_be_added`)
       remote_node = self._remote.getRemoteNode(remote_address)
-      print('remote_node: ', remote_node)
       successor = remote_node.find_successor(self.id())
-      print('remote_node successor: ', successor)
       # 2) point `to_be_added`’s `successor` to the node found
-      print('successor: ', successor)
       self._successor = successor
-    #   self._finger[0] = FingerEntry(self.id(), successor)
-    #   print('----finger----', self._finger)
       # 3) copy keys less than `ID(to_be_added)` from the `successor`
 
     else:
       # current node is the first node on the Chord ring
       self._successor = self
     #   self._finger[0] = FingerEntry(self.id(), self)
-    #   self._predecessor = self
+      self._predecessor = self
 
     # 4) call `to_be_added`.stabilize() to update the nodes between `to_be_added` and its predecessor
     # self.stabilize()
@@ -101,23 +97,31 @@ class Node(object):
       start = self.id() + (2 ** 0)
 
       # assign the first entry, find the successor(k)
-      self._finger[0] = FingerEntry(start, remote_node.find_successor(start))
+      successor_k = remote_node.find_successor(start)
+      self._finger[0] = FingerEntry(start, successor_k)
 
-      self._predecessor = successor.predecessor
-      self._successor.predecessor = self
+      # successor
+      successor = self.successor()
+      if successor is None:
+        successor = remote_node.find_successor(self.id())
+        self._successor = successor
+
+      self._predecessor = self._successor.predecessor
+      self._successor._predecessor = self
 
       for x in range(1, M_BIT):
        keyID = (self.id() + 2 ** (x - 1)) % NUM_SLOTS
       self._finger[x] = FingerEntry(keyID, self)
+
     else:
     # n is the only node in the network
       for x in range(0, M_BIT):
-        self._finger[x] = FingerEntry(self.id() + 2 ** (x - 1) % NUM_SLOTS, self)
+        start_id = math.floor(self.id() + 2 ** (x - 1) % NUM_SLOTS)
+        self._finger[x] = FingerEntry(start_id, self)
 
-    #   remote_node = self._remote.getRemoteNode(remote_address)
-    #   print('remote_node: ', remote_node)
-    #   self._finger[x] = remote_node.find_successor(keyID)
-
+    for x in range(0, M_BIT):
+      if self._finger[x] is not None:
+        print('finger table of ', self.id() ,self._finger[x].node.id())
   # def update_successors(self):
   #   self.log("update successor")
   #   return True
@@ -132,40 +136,22 @@ class Node(object):
     # return self._address.__hash__()
 
   def successor(self):
-    # We make sure to return an existing successor, there `might`
-    # be redundance between _finger[0] and _successors[0], but
-    # it doesn't harm
-    # print("No successor available, aborting")
     return self._successor
 
   def predecessor(self):
     return self._predecessor
 
-#   def find_successor(self, id):
-#     self.log("find_successor")
-#     print('self.id(): ', self.id())
-#     print('self._successor.id(): ', self._successor)
-#     if inrange(id, self.id(), self._successor.id()):
-#       return self._successor
-#     else:
-#       c = self._closest_preceding_node(id)
-#       return c.find_successor(id)
-#     # if (id belongs to (n, successor]) return successor;
-#     # else
-#     # n′ = closest_preceding_node(id); return n′.find successor(id);
-
-
   def find_successor(self, id):
     self.log("find_successor")
-    print('self.id(): ', self.id())
-    print('self._successor.id(): ', self._successor)
-    return self.find_predecessor(id).successor
+    # print('self.id(): ', self.id())
+    # print('self._successor.id(): ', self._successor)
+    return self.find_predecessor(id).successor()
 
   def find_predecessor(self, id):
     self.log("find_predecessor")
     node = self
     # If we are alone in the ring, we are the pred(id)
-    while (inrange(id, node.id(), node.successor.id()):
+    while inrange(id, node.id(), node.successor().id()):
       node = node._closest_preceding_node(id)
     return node
 

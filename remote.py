@@ -16,6 +16,10 @@ class RemoteConnection(object):
     # create an initial nodes and add it to the Chord ring
     addr = Address(self._base_address)
     index = addr.__hash__()
+
+    # avoid collision of hashing
+    while nodes[index] is not None:
+      index = (index + 1) % NUM_SLOTS
     nodes[index] = Node(addr, self)
     self._nodes = nodes
 
@@ -27,6 +31,10 @@ class RemoteConnection(object):
     node = Node(Address(address), self, Address(remote_address))
     # print('target_address: ', target_address.__hash__())
     index = target_address.__hash__()
+
+    # avoid collision of hashing
+    while self._nodes[index] is not None:
+      index = (index + 1) % NUM_SLOTS
     self._nodes[index] = node
     # print('--------')
 
