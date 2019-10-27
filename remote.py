@@ -12,31 +12,35 @@ class RemoteConnection(object):
 
     # all slots, a ring
     nodes = [None for x in range(NUM_SLOTS)]
+    self._nodes = nodes
 
     # create an initial nodes and add it to the Chord ring
     addr = Address(self._base_address)
     index = addr.__hash__()
 
     # avoid collision of hashing
-    while nodes[index] is not None:
+    while self._nodes[index] is not None:
       index = (index + 1) % NUM_SLOTS
-    nodes[index] = Node(addr, self)
-    self._nodes = nodes
+    self._nodes[index] = Node(addr, self)
 
     for x in range(1, len(address)):
       self.addNode(address[x], self._base_address)
 
   def addNode(self, address, remote_address = None):
-    target_address = Address(address)
-    node = Node(Address(address), self, Address(remote_address))
+    Node(Address(address), self, Address(remote_address))
+    
+    # print('--------')
+
+  def addToNetwork(self, index, node):
     # print('target_address: ', target_address.__hash__())
-    index = target_address.__hash__()
 
     # avoid collision of hashing
     while self._nodes[index] is not None:
       index = (index + 1) % NUM_SLOTS
     self._nodes[index] = node
-    # print('--------')
+
+  def notify(self, index):
+    return self._nodes[index]
 
   # get remote node on the Chord ring by its address
   def getRemoteNode(self, address):
@@ -48,8 +52,7 @@ class RemoteConnection(object):
     return node
 
   def getRemoteNodeByID(self, id):
-    pass
-    # return self._nodes(id)
+    return self._nodes[id]
 
   # return all slots on the ring
   def getNodes(self):
@@ -59,7 +62,7 @@ class RemoteConnection(object):
   def printNodes(self):
     for x in range(len(self._nodes)):
       if self._nodes[x]:
-        print(self._nodes[x].address().__str__())
+        print(x, self._nodes[x].address().__str__())
       else:
-        print(self._nodes[x])
+        print(x, self._nodes[x])
     

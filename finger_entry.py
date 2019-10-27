@@ -5,4 +5,3 @@ class FingerEntry(object):
     self.start = start
     # node
     self.node = node
-    
