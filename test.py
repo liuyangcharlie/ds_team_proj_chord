@@ -7,10 +7,11 @@ from env import *
 m = M_BIT
 
 address = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
+# address = ["127.0.0.1", "127.0.0.2"]
 
 ring = RemoteConnection(address)
 
-ring.addNode("127.0.0.5", "127.0.0.1")
+# ring.addNode("127.0.0.5", "127.0.0.1")
 
 ring.printNodes()
 

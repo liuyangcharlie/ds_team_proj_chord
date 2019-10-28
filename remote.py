@@ -27,7 +27,12 @@ class RemoteConnection(object):
       self.addNode(address[x], self._base_address)
 
   def addNode(self, address, remote_address = None):
+    if remote_address is None:
+      remote_address = self._base_address
     Node(Address(address), self, Address(remote_address))
+    print('address: ', address)
+    self.printNodes()
+    return self.ringShape()
     
     # print('--------')
 
@@ -57,6 +62,32 @@ class RemoteConnection(object):
   # return all slots on the ring
   def getNodes(self):
     return self._nodes
+
+  def ringShape(self):
+    s = []
+    for x in range(len(self._nodes)):
+      if self._nodes[x] is not None:
+        s.append({'addr': self._nodes[x]._address.__str__(), 'finger': self._nodes[x].getFinger()})
+      else:
+        s.append(None)
+
+    return s
+
+  def nodeDepature(self, id):
+    self._nodes[id].shutdown()
+    self._nodes[id] = None
+    return self.ringShape()
+
+  def lookup(self, key, id):
+    # node = self._nodes[id].find_successor(key)
+    # print('nodenode', node)
+    # return node.id()
+    for x in range(key, len(self._nodes)):
+      if self._nodes[x] is not None:
+        return x
+    for x in range(key):
+      if self._nodes[x] is not None:
+        return x
 
   # print nodes
   def printNodes(self):

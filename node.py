@@ -187,6 +187,16 @@ class Node(object):
 
     return self
 
+  def getFinger(self):
+    finger = []
+    for x in range(len(self._finger)):
+      if self._finger[x] is not None:
+        finger.append({'start': self._finger[x].start, 'node': self._finger[x].node.id()})
+      else:
+        finger.append({})
+
+    return finger
+
   def update_finger(self):
     for x in range(M_BIT):
       new_finger = self._remote.notify(self._finger[x].start)
@@ -212,18 +222,3 @@ class Node(object):
       self._predecessor = None
     threading.Timer(10, self.check_predecessor).start()
 
-  # this is called periodically(timer/deamon)
-  # refresh finger table entries
-  def _fix_fingers(self):
-    # randomly pick an entry in finger table
-    # call find_successor on its start_id
-    pass
-
-    # first fingers in decreasing distance, then successors in
-    # increasing distance.
-    self.log("_fix_fingers")
-    # for remote in reversed(self._successors + self._finger):
-    #   if remote != None and inrange(remote.id(), self.id(1), id) and remote.ping():
-    #     return remote
-    # return self
-    threading.Timer(10, self.check_predecessor).start()
