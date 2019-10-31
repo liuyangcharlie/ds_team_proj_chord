@@ -4,9 +4,7 @@ let fingers;
 $.get('/create_ring', function (data) {
     return data
 }).done(function (data) {
-    $.get('/get_all_finger', function (data) {
-        render(data);
-    })
+    startRender()
 
     $('#lookup').on('click', (e) => {
         const key = $('#lookup_key').val();
@@ -99,4 +97,12 @@ function validateIp(ipaddress) {
     }
     alert("You have entered an invalid IP address!")
     return (false)
+}
+
+function startRender() {
+    setInterval(() => {
+        $.get('/get_all_finger', function (data) {
+            render(data);
+        })
+    }, 5)
 }

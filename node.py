@@ -35,7 +35,8 @@ class Node(object):
     # join the DHT
     self.join(remote_address)
 
-    self.check_predecessor()
+    # in case any node depatures
+    # self.check_predecessor()
 
   def address(self):
     return self._address.__str__()
@@ -52,9 +53,9 @@ class Node(object):
 
   # logging function
   def log(self, info):
-      f = open("/tmp/chord.log", "a+")
-      f.write(str(self.id()) + " : " +  info + "\n")
-      f.close()
+    #   f = open("/tmp/chord.log", "a+")
+    #   f.write(str(self.id()) + " : " +  info + "\n")
+    #   f.close()
       print(str(self.id()) + " : " +  info)
 
   # return true if node does not leave, i.e. still in the Chord ring
@@ -76,14 +77,16 @@ class Node(object):
 
     if remote_address:
       # 1) add to a node `n`, n.find_successor(`to_be_added`)
+      start = (self.id() + (2 ** 0)) % NUM_SLOTS
       remote_node = self._remote.getRemoteNode(remote_address)
-      successor = remote_node.find_successor(self.id())
+      successor = remote_node.find_successor(start)
+      self._finger[0] = FingerEntry(start, successor)
       # 2) point `to_be_added`’s `successor` to the node found
       self._successor = successor
       # 3) copy keys less than `ID(to_be_added)` from the `successor`
-      self._predecessor = self.find_predecessor(self.id())
-    #   self._predecessor = self._successor._predecessor
-      self._predecessor._successor = self
+    #   self._predecessor = self.find_predecessor(self.id())
+      self._predecessor = successor._predecessor
+    #   self._predecessor._successor = self
       # update its successor's predecessor
       self._successor._predecessor = self
 
@@ -95,10 +98,12 @@ class Node(object):
 
     # add other entries in finger table
     self.init_finger(remote_address)
-    self.update_finger()
+    # self.update_others()
+    # self.update_finger()
+    self.fix_finger()
 
     # 4) call `to_be_added`.stabilize() to update the nodes between `to_be_added` and its predecessor
-    # self.stabilize()
+    self.stabilize()
 
     self.log("joined")
 
@@ -110,11 +115,11 @@ class Node(object):
       remote_node = self._remote.getRemoteNode(remote_address)
 
       # get attribute `start` for the first entry in this finger table
-      start = (self.id() + (2 ** 0)) % NUM_SLOTS
+    #   start = (self.id() + (2 ** 0)) % NUM_SLOTS
 
       # assign the first entry, find the successor(k)
-      successor_k = remote_node.find_successor(start)
-      self._finger[0] = FingerEntry(start, successor_k)
+    #   successor_k = remote_node.find_successor(start)
+    #   self._finger[0] = FingerEntry(start, successor_k)
 
       # successor
       successor = self.successor()
@@ -122,9 +127,9 @@ class Node(object):
         successor = remote_node.find_successor(self.id())
         self._successor = successor
 
-      self._predecessor = self._successor._predecessor
+    #   self._predecessor = self._successor._predecessor
       # update its successor's predecessor
-      self._successor._predecessor = self
+    #   self._successor._predecessor = self
 
       # initialize finger table
       for x in range(1, M_BIT):
@@ -146,9 +151,7 @@ class Node(object):
         start_id = math.floor((self.id() + 2 ** x) % NUM_SLOTS)
         self._finger[x] = FingerEntry(start_id, self)
 
-    for x in range(0, M_BIT):
-      if self._finger[x] is not None:
-        print('finger table of ', self.id(), 'start: ', self._finger[x].start, 'node', self._finger[x].node.id())
+    self.print_finger('init_finger')
 
   def id(self, offset = 0):
     # return (self._address.__hash__() + offset) % SIZE
@@ -163,7 +166,9 @@ class Node(object):
 
   def find_successor(self, id):
     self.log("find_successor of {}".format(id))
-    # if self.predecessor() and 
+    # if self._predecessor exists, and _predecessor.id < id < self.id, the successor is current node
+    if self._predecessor and inrange(id, self._predecessor.id(), self.id()):
+      return self
     return self.find_predecessor(id).successor()
 
   def find_predecessor(self, id):
@@ -174,7 +179,7 @@ class Node(object):
     # if we are alone in the ring, we are the pred(id)
     if node.id() == node.successor().id():
       return node
-    while not inrange(id, node.id(), node.successor().id()):
+    while not inrange(id, node.id(), node.successor().id() + 1):
       node = node._closest_preceding_node(id)
     return node
 
@@ -182,12 +187,12 @@ class Node(object):
     # from m down to 1
     for x in reversed(range(len(self._finger))):
       entry = self._finger[x]
-      if entry.node != None and inrange(entry.node.id(), self.id(), id):
+      if entry != None and entry.node != None and inrange(entry.node.id(), self.id(), id):
         return entry.node
 
     return self
 
-  def getFinger(self):
+  def get_finger(self):
     finger = []
     for x in range(len(self._finger)):
       if self._finger[x] is not None:
@@ -197,21 +202,34 @@ class Node(object):
 
     return finger
 
-  def update_finger(self):
-    for x in range(M_BIT):
-      new_finger = self._remote.notify(self._finger[x].start)
-      if new_finger is None:
+  def update_finger(self, successor, index):
+    # for x in range(M_BIT):
+    #   new_finger = self._remote.notify(self._finger[x].start)
+    #   if new_finger is None:
+    #     continue
+    #   if x is 0:
+    #     self._successor = new_finger
+
+    #   self._finger[x].node = new_finger
+
+    # for x in range(len(self._finger)):
+    if self._finger[index] is not None:
+      if inrange(successor.id(), self.id() - 1, self._finger[index].node.id()):
+        self._finger[index].node = successor
+        self._predecessor.update_finger(successor, index)
+        # print('finger table of ', self.id(), 'start: ', self._finger[x].start, 'node', self._finger[x].node.id())
+
+    # threading.Timer(2, self.update_finger).start()
+
+  def update_others(self):
+    for x in range(1, M_BIT + 1):
+      # find last node whose i-th finger might be current node
+      start = (self.id() - 2 ** (x - 1)) % NUM_SLOTS
+      pre = self.find_predecessor(start)
+      # if only one node on the ring, no need to update others
+      if pre.id() == self.id():
         continue
-      if x is 0:
-        self._successor = new_finger
-
-      self._finger[x].node = new_finger
-
-    for x in range(len(self._finger)):
-      if self._finger[x] is not None:
-        print('finger table of ', self.id(), 'start: ', self._finger[x].start, 'node', self._finger[x].node.id())
-
-    threading.Timer(10, self.update_finger).start()
+      pre.update_finger(self, x)
 
   # called periodically.
   # clear the node’s predecessor pointer if n.predecessor is alive, or has failed
@@ -220,5 +238,45 @@ class Node(object):
     self.log(lg)
     if not self.predecessor().ping():
       self._predecessor = None
-    threading.Timer(10, self.check_predecessor).start()
+    threading.Timer(2, self.check_predecessor).start()
+
+  # called periodically
+  def stabilize(self):
+    # check its own successor if any new node added between its previous successor
+    pre = self._successor._predecessor
+    if inrange(pre.id(), self.id(), self._successor.id()):
+      self.log('update_successor')
+      self.update_successor(pre)
+    self._successor.notify(self)
+    self.print_finger('stabilize')
+
+    threading.Timer(2, self.stabilize).start()
+
+  def notify(self, pre):
+    # check if pre is the new predecessor
+    if (self._predecessor is None or inrange(pre.id(), self._predecessor.id(), self.id())):
+      self._predecessor = pre
+  
+  # called periodically
+  def fix_finger(self):
+    self.log('fix_finger')
+    # for x in range(len(self._finger)):
+    #   start = self._finger[x].start
+    #   self._finger[x].node = self.find_successor(start)
+    # threading.Timer(2, self.fix_finger).start()
+    index = random.randrange(M_BIT - 1) + 1
+    self._finger[index].node = self.find_successor(self._finger[index].start)
+
+    # self.print_finger('fix_finger')
+
+    threading.Timer(2, self.fix_finger).start()
+
+  def update_successor(self, new_s):
+    self._successor = new_s
+    self._finger[0].node = new_s
+
+  def print_finger(self, mod='default'):
+    for x in range(0, M_BIT):
+      if self._finger[x] is not None:
+        self.log('{}: finger table of {}, start: {}, node: {}'.format(mod, self.id(), self._finger[x].start, self._finger[x].node.id()))
 

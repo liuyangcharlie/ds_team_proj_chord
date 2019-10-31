@@ -67,7 +67,7 @@ class RemoteConnection(object):
     s = []
     for x in range(len(self._nodes)):
       if self._nodes[x] is not None:
-        s.append({'addr': self._nodes[x]._address.__str__(), 'finger': self._nodes[x].getFinger()})
+        s.append({'addr': self._nodes[x]._address.__str__(), 'finger': self._nodes[x].get_finger()})
       else:
         s.append(None)
 

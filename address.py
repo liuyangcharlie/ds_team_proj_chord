@@ -3,10 +3,15 @@ from env import *
 
 # Helper function to determine if a key falls within a range
 def inrange(c, a, b):
+  a = a % NUM_SLOTS
+  b = b % NUM_SLOTS
+  print('inrange: ', c, a, b)
+#   if a == b:
+#     return c == a
   if a < b:
-    return a <= c and c <= b
+    return a < c and c < b
   # when a is larger than b, meaning overlap on the circle
-  return a <= c or c < b
+  return a < c or c < b
 
 class Address(object):
   def __init__(self, ip, port=9999):
