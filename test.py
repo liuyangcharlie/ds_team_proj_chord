@@ -15,6 +15,16 @@ ring = RemoteConnection(address)
 
 ring.printNodes()
 
+n = None
+for x in range(len(ring._nodes)):
+  if ring._nodes[x] is not None:
+    n = ring._nodes[x]
+    break
+
+print('ring._nodes[0].id()', n.id())
+
+ring.nodeDepature(n.id())
+
 # def printEverySuccessor():
 #   while x in range(len(nodes)):
 #     print(nodes[x].successor())

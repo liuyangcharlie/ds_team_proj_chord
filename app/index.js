@@ -1,6 +1,9 @@
-let $body = $('#container .circle-container');
+const $container = $('#container .circle-container');
+const $tip = $('#tip');
+
 let fingers;
 
+$tip.text('Creating Chord ring...');
 $.get('/create_ring', function (data) {
     return data
 }).done(function (data) {
@@ -31,6 +34,7 @@ $.get('/create_ring', function (data) {
 
         $.get(`/add_node?ip=${ip}`, (data) => {
             render(data);
+            $tip.text(`node ${ip} added`)
         });
     })
 
@@ -42,6 +46,7 @@ $.get('/create_ring', function (data) {
 
         $.get(`/remove_node?id=${id}`, (data) => {
             render(data);
+            $tip.text(`node ${id} leaves`)
         })
     })
 })
@@ -63,7 +68,7 @@ function render(data) {
 
     const nodeInfo = $('#node_info');
 
-    $body.on('mouseover', '.active', (e) => {
+    $container.on('mouseover', '.active', (e) => {
         const current = $(e.target).attr('node_id');
         const info = fingers.shape[current];
 
@@ -86,11 +91,11 @@ function render(data) {
         nodeInfo.html(node);
     })
 
-    $body.on('mouseout', '.active', (e) => {
+    $container.on('mouseout', '.active', (e) => {
         nodeInfo.html('Hover on a node to view details');
     })
 
-    $body.html(lots)
+    $container.html(lots)
 }
 
 function validateIp(ipaddress) {
@@ -104,6 +109,7 @@ function validateIp(ipaddress) {
 function startRender() {
     setInterval(() => {
         $.get('/get_all_finger', function (data) {
+            $tip.text('');
             render(data);
         })
     }, 1000)

@@ -70,7 +70,7 @@ class RemoteConnection(object):
     return s
 
   def nodeDepature(self, id):
-    self._nodes[id].shutdown()
+    self._nodes[id].leave()
     self._nodes[id] = None
     return self.ringShape()
 

@@ -22,12 +22,12 @@ class Node(object):
     # initialize successor
     self._successor = None
     # list of successors is to prevent lookup failure
-    self._successors = []
+    self._successors = [None for x in range(M_BIT)]
     # initialize predecessor
     self._predecessor = None
     # finger table
     self._finger = None
-    self._shutdown = False
+    self._leave = False
 
     self._remote.addToNetwork(self._id, self)
 
@@ -35,14 +35,14 @@ class Node(object):
     self.join(remote_address)
 
     # in case any node depatures
-    # self.check_predecessor()
+    self.check_predecessor()
 
   def address(self):
     return self._address.__str__()
 
   # node leave
-  def shutdown(self):
-    self._shutdown = True
+  def leave(self):
+    self._leave = True
 
   # logging function
   def log(self, info):
@@ -53,7 +53,7 @@ class Node(object):
 
   # return true if node does not leave, i.e. still in the Chord ring
   def ping(self):
-    if self._shutdown:
+    if self._leave:
       return False
     return True
 
@@ -88,6 +88,7 @@ class Node(object):
     # add other entries in finger table
     self.init_finger(remote_address)
     self.fix_finger()
+    self.update_successors()
 
     # 4) call `to_be_added`.stabilize() to update the nodes between `to_be_added` and its predecessor
     self.stabilize()
@@ -129,11 +130,32 @@ class Node(object):
 
     self.print_finger('init_finger')
 
+  def update_successors(self):
+    if self._leave:
+      return
+    successor = self._successor
+    for x in range(M_BIT):
+      if successor is not None:
+        self._successors[x] = successor
+        successor = successor.successor()
+
+    threading.Timer(2, self.update_successors).start()
+
   def id(self, offset = 0):
     return self._id
 
   def successor(self):
-    return self._successor
+    successor = self._successor
+    print('current successor', self._successor.ping())
+
+    if not successor.ping():
+      for x in range(1, len(self._successors)):
+        if self._successors[x].ping():
+          successor = self._successors[x]
+
+    print('current successor', successor.id())
+
+    return successor
 
   def predecessor(self):
     return self._predecessor
@@ -198,20 +220,28 @@ class Node(object):
   # called periodically
   # clear the node’s predecessor pointer if n.predecessor is alive, or has failed
   def check_predecessor(self):
-    log = 'check_predecessor, predecessor of {}: , isAlive: {}'.format(self.predecessor().id(), self.predecessor().ping())
-    self.log(log)
-    if not self.predecessor().ping():
+    if self._leave:
+      return
+    # log = 'check_predecessor, predecessor of {}: , isAlive: {}'.format(self.predecessor().id(), self.predecessor().ping())
+    # self.log(log)
+    pre = self.predecessor()
+    if pre is not None and not pre.ping():
       self._predecessor = None
     threading.Timer(2, self.check_predecessor).start()
 
   # called periodically
   # check its own successor if any new node added between its previous successor
   def stabilize(self):
-    pre = self._successor._predecessor
-    if inrange(pre.id(), self.id(), self._successor.id()):
+    if self._leave:
+      return
+    # prevent successor failure
+    successor = self.successor()
+
+    pre = successor._predecessor
+    if pre is not None and inrange(pre.id(), self.id(), successor.id()):
       self.log('stabilize calls update_successor')
       self.update_successor(pre)
-    self._successor.notify(self)
+    successor.notify(self)
     self.print_finger('stabilize')
 
     threading.Timer(2, self.stabilize).start()
@@ -223,6 +253,8 @@ class Node(object):
   
   # called periodically
   def fix_finger(self):
+    if self._leave:
+      return
     self.log('fix_finger')
     index = random.randrange(M_BIT - 1) + 1
     self._finger[index].node = self.find_successor(self._finger[index].start)
