@@ -58,7 +58,7 @@ def print_ring():
 def get_all_finger():
     global ring
     rs = ring.ringShape()
-    return Headers({"content-type": "application/json"}), {'error': None, 'shape': rs}
+    return Headers({"content-type": "application/json"}), {'error': None, 'shape': rs, 'm': M_BIT}
 
 @request_map("/add_node")
 def add_node(ip):

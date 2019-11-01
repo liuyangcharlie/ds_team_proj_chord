@@ -48,14 +48,17 @@ $.get('/create_ring', function (data) {
 
 function render(data) {
     fingers = data;
-    const numOfLot = 8;
+    const numOfLot = Math.pow(2, data.m || 3);
     const lots = [];
     const shape = fingers.shape
     
     for(let i = 0; i < numOfLot; i++) {
-        lots.push($(`<div ${shape[i] != null ? 'class="active"' : ''} node_id=${i}>
-            <span>${i}</span>
-        </div>`));
+        const dot = $(`<div ${shape[i] != null ? 'class="active"' : ''} node_id=${i}>
+            <span style="color: red">${i}</span>
+        </div>`);
+        const deg = (360 / numOfLot) * i;
+        dot.css('transform', `rotate(${deg}deg) translate(16.5em) rotate(-${deg}deg)`)
+        lots.push(dot);
     }
 
     const nodeInfo = $('#node_info');
@@ -103,5 +106,5 @@ function startRender() {
         $.get('/get_all_finger', function (data) {
             render(data);
         })
-    }, 5)
+    }, 1000)
 }
