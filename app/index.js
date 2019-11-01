@@ -51,7 +51,6 @@ function render(data) {
     const numOfLot = 8;
     const lots = [];
     const shape = fingers.shape
-    console.log(shape)
     
     for(let i = 0; i < numOfLot; i++) {
         lots.push($(`<div ${shape[i] != null ? 'class="active"' : ''} node_id=${i}>
