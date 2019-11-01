@@ -75,15 +75,8 @@ class RemoteConnection(object):
     return self.ringShape()
 
   def lookup(self, key, id):
-    # node = self._nodes[id].find_successor(key)
-    # print('nodenode', node)
-    # return node.id()
-    for x in range(key, len(self._nodes)):
-      if self._nodes[x] is not None:
-        return x
-    for x in range(key):
-      if self._nodes[x] is not None:
-        return x
+    node = self._nodes[id].find_successor(key)
+    return node.id()
 
   # print nodes for testing
   def printNodes(self):
