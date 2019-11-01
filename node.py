@@ -246,12 +246,14 @@ class Node(object):
 
     threading.Timer(2, self.stabilize).start()
 
+  # receive request that some node thinks it might be our predecessor
   def notify(self, pre):
     # check if pre is the new predecessor
     if (self._predecessor is None or inrange(pre.id(), self._predecessor.id(), self.id())):
       self._predecessor = pre
-  
+
   # called periodically
+  # randomly update finger table
   def fix_finger(self):
     if self._leave:
       return
@@ -262,6 +264,7 @@ class Node(object):
 
     threading.Timer(2, self.fix_finger).start()
 
+  # update both first entry in finger table and _successor
   def update_successor(self, new_s):
     self._successor = new_s
     self._finger[0].node = new_s
