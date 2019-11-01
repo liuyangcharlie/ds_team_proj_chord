@@ -12,7 +12,6 @@ from finger_entry import FingerEntry
 class Node(object):
   def __init__(self, local_address, remote, remote_address = None):
     self._address = local_address
-    # print("self id = ", self.id())
     _id = self._address.__hash__() % NUM_SLOTS
     while remote.getRemoteNodeByID(_id) is not None:
       _id = (_id + 1) % NUM_SLOTS
@@ -41,12 +40,6 @@ class Node(object):
   def address(self):
     return self._address.__str__()
 
-  # is this id within our range? i.e. is key in local node?
-  def is_ours(self, id):
-    # assert id >= 0 and id < SIZE
-    # return inrange(id, self._predecessor.id(1), self.id(1))
-    pass
-
   # node leave
   def shutdown(self):
     self._shutdown = True
@@ -72,9 +65,6 @@ class Node(object):
     # initialize finger table
     self._finger = [None for x in range(M_BIT)]
 
-    # initialize predecessor
-    # self._predecessor = None
-
     if remote_address:
       # 1) add to a node `n`, n.find_successor(`to_be_added`)
       start = (self.id() + (2 ** 0)) % NUM_SLOTS
@@ -84,9 +74,8 @@ class Node(object):
       # 2) point `to_be_added`’s `successor` to the node found
       self._successor = successor
       # 3) copy keys less than `ID(to_be_added)` from the `successor`
-    #   self._predecessor = self.find_predecessor(self.id())
+      # self._predecessor = self.find_predecessor(self.id())
       self._predecessor = successor._predecessor
-    #   self._predecessor._successor = self
       # update its successor's predecessor
       self._successor._predecessor = self
 
@@ -98,8 +87,6 @@ class Node(object):
 
     # add other entries in finger table
     self.init_finger(remote_address)
-    # self.update_others()
-    # self.update_finger()
     self.fix_finger()
 
     # 4) call `to_be_added`.stabilize() to update the nodes between `to_be_added` and its predecessor
@@ -114,22 +101,11 @@ class Node(object):
       # get the arbitrary node in which the target node want to join
       remote_node = self._remote.getRemoteNode(remote_address)
 
-      # get attribute `start` for the first entry in this finger table
-    #   start = (self.id() + (2 ** 0)) % NUM_SLOTS
-
-      # assign the first entry, find the successor(k)
-    #   successor_k = remote_node.find_successor(start)
-    #   self._finger[0] = FingerEntry(start, successor_k)
-
       # successor
       successor = self.successor()
       if successor is None:
         successor = remote_node.find_successor(self.id())
         self._successor = successor
-
-    #   self._predecessor = self._successor._predecessor
-      # update its successor's predecessor
-    #   self._successor._predecessor = self
 
       # initialize finger table
       for x in range(1, M_BIT):
@@ -154,8 +130,6 @@ class Node(object):
     self.print_finger('init_finger')
 
   def id(self, offset = 0):
-    # return (self._address.__hash__() + offset) % SIZE
-
     return self._id
 
   def successor(self):
@@ -203,16 +177,6 @@ class Node(object):
     return finger
 
   def update_finger(self, successor, index):
-    # for x in range(M_BIT):
-    #   new_finger = self._remote.notify(self._finger[x].start)
-    #   if new_finger is None:
-    #     continue
-    #   if x is 0:
-    #     self._successor = new_finger
-
-    #   self._finger[x].node = new_finger
-
-    # for x in range(len(self._finger)):
     if self._finger[index] is not None:
       if inrange(successor.id(), self.id() - 1, self._finger[index].node.id()):
         self._finger[index].node = successor
@@ -231,21 +195,21 @@ class Node(object):
         continue
       pre.update_finger(self, x)
 
-  # called periodically.
+  # called periodically
   # clear the node’s predecessor pointer if n.predecessor is alive, or has failed
   def check_predecessor(self):
-    lg = 'check_predecessor, predecessor of {}: , isAlive: {}'.format(self.predecessor().id(), self.predecessor().ping())
-    self.log(lg)
+    log = 'check_predecessor, predecessor of {}: , isAlive: {}'.format(self.predecessor().id(), self.predecessor().ping())
+    self.log(log)
     if not self.predecessor().ping():
       self._predecessor = None
     threading.Timer(2, self.check_predecessor).start()
 
   # called periodically
+  # check its own successor if any new node added between its previous successor
   def stabilize(self):
-    # check its own successor if any new node added between its previous successor
     pre = self._successor._predecessor
     if inrange(pre.id(), self.id(), self._successor.id()):
-      self.log('update_successor')
+      self.log('stabilize calls update_successor')
       self.update_successor(pre)
     self._successor.notify(self)
     self.print_finger('stabilize')
@@ -260,13 +224,8 @@ class Node(object):
   # called periodically
   def fix_finger(self):
     self.log('fix_finger')
-    # for x in range(len(self._finger)):
-    #   start = self._finger[x].start
-    #   self._finger[x].node = self.find_successor(start)
-    # threading.Timer(2, self.fix_finger).start()
     index = random.randrange(M_BIT - 1) + 1
     self._finger[index].node = self.find_successor(self._finger[index].start)
-
     # self.print_finger('fix_finger')
 
     threading.Timer(2, self.fix_finger).start()

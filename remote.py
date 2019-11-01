@@ -1,8 +1,8 @@
 from address import Address
 from node import Node
-from env import *
+from env import NUM_SLOTS
 
-# class to call any remote node other than local one, always called by the local one
+# class to simulate RPC call, call any remote node other than local one
 class RemoteConnection(object):
   """docstring for Remote"""
   def __init__(self, address):
@@ -30,15 +30,11 @@ class RemoteConnection(object):
     if remote_address is None:
       remote_address = self._base_address
     Node(Address(address), self, Address(remote_address))
-    print('address: ', address)
+    # print('address: ', address)
     self.printNodes()
     return self.ringShape()
-    
-    # print('--------')
 
   def addToNetwork(self, index, node):
-    # print('target_address: ', target_address.__hash__())
-
     # avoid collision of hashing
     while self._nodes[index] is not None:
       index = (index + 1) % NUM_SLOTS
@@ -89,7 +85,7 @@ class RemoteConnection(object):
       if self._nodes[x] is not None:
         return x
 
-  # print nodes
+  # print nodes for testing
   def printNodes(self):
     for x in range(len(self._nodes)):
       if self._nodes[x]:

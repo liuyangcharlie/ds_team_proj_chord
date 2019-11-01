@@ -1,5 +1,5 @@
 # import hashlib
-from env import *
+from env import NUM_SLOTS
 
 # Helper function to determine if a key falls within a range
 def inrange(c, a, b):
@@ -20,7 +20,6 @@ class Address(object):
 
   def __hash__(self):
     h = hash(("%s:%s" % (self.ip, self.port)).encode()) % NUM_SLOTS
-    # print('__ip__: ', self.ip, '__hash__: ', h)
     return h
 
   def __cmp__(self, other):

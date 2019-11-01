@@ -3,7 +3,7 @@ import os
 from node import Node
 from remote import RemoteConnection
 from address import Address
-from env import *
+from env import M_BIT
 
 from simple_http_server import request_map
 from simple_http_server import Response
@@ -46,13 +46,11 @@ def create_ring():
     ring = RemoteConnection(address)
     return Headers({"content-type": "application/json"}), {'error': None}
 
-
 @request_map("/print_ring")
 def print_ring():
     global ring
     ring.printNodes()
     return Headers({"content-type": "application/json"}), {'error': None}
-
 
 @request_map("/get_all_finger")
 def get_all_finger():
