@@ -46,9 +46,9 @@ class Node(object):
 
   # logging function
   def log(self, info):
-    #   f = open("/tmp/chord.log", "a+")
-    #   f.write(str(self.id()) + " : " +  info + "\n")
-    #   f.close()
+      f = open("/tmp/chord.log", "a+")
+      f.write(str(self.id()) + " : " +  info + "\n")
+      f.close()
       print(str(self.id()) + " : " +  info)
 
   # return true if node does not leave, i.e. still in the Chord ring
@@ -74,7 +74,6 @@ class Node(object):
       # 2) point `to_be_added`’s `successor` to the node found
       self._successor = successor
       # 3) copy keys less than `ID(to_be_added)` from the `successor`
-      # self._predecessor = self.find_predecessor(self.id())
       self._predecessor = successor._predecessor
       # update its successor's predecessor
       self._successor._predecessor = self
@@ -82,12 +81,14 @@ class Node(object):
     else:
       # current node is the first node on the Chord ring
       self._successor = self
-    #   self._finger[0] = FingerEntry(self.id(), self)
+      # self._finger[0] = FingerEntry(self.id(), self)
       self._predecessor = self
 
     # add other entries in finger table
     self.init_finger(remote_address)
+
     self.fix_finger()
+
     self.update_successors()
 
     # 4) call `to_be_added`.stabilize() to update the nodes between `to_be_added` and its predecessor
@@ -130,10 +131,14 @@ class Node(object):
 
     self.print_finger('init_finger')
 
+  # called periodically
+  # back-up successor list, a M_BIT-long successor link list
   def update_successors(self):
     if self._leave:
       return
+
     successor = self._successor
+
     for x in range(M_BIT):
       if successor is not None:
         self._successors[x] = successor
@@ -222,11 +227,12 @@ class Node(object):
   def check_predecessor(self):
     if self._leave:
       return
-    # log = 'check_predecessor, predecessor of {}: , isAlive: {}'.format(self.predecessor().id(), self.predecessor().ping())
-    # self.log(log)
+
+    # self.log('check_predecessor, predecessor of {}: , isAlive: {}'.format(self.predecessor().id(), self.predecessor().ping()))
     pre = self.predecessor()
     if pre is not None and not pre.ping():
       self._predecessor = None
+
     threading.Timer(2, self.check_predecessor).start()
 
   # called periodically
@@ -241,11 +247,13 @@ class Node(object):
     if pre is not None and inrange(pre.id(), self.id(), successor.id()):
       self.log('stabilize calls update_successor')
       self.update_successor(pre)
+
     successor.notify(self)
     self.print_finger('stabilize')
 
     threading.Timer(2, self.stabilize).start()
 
+  # RPC call
   # receive request that some node thinks it might be our predecessor
   def notify(self, pre):
     # check if pre is the new predecessor
