@@ -6,8 +6,6 @@ from env import *
 
 m = M_BIT
 
-# address = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
-# address = ["127.0.0.1", "127.0.0.2", "127.0.0.3"]
 # a list of docker containers' ip address
 address = ["172.17.0.2", "172.17.0.3"]
 
