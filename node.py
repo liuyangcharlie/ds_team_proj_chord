@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 #!/bin/python
 import sys
 import random
 import math
 import threading
-import util
 
 from env import *
 from address import inrange
 from finger_entry import FingerEntry
-from rpc_server_handler import Rpc
 
 # class representing a local peer
 class Node(object):
@@ -22,16 +19,9 @@ class Node(object):
 
     # communication with other node via _remote
     self._remote = remote
-
-    # the RPC server of the node itself
-    self.rpc_server = None
-    
-    # a hash map of thrift clients connected to remote nodes, key is a str of ip, value is the thrift client
-    self.remote_clients = {}
-    
     # initialize successor
     self._successor = None
-    # list of successors as backup is to prevent lookup failure
+    # list of successors is to prevent lookup failure
     self._successors = [None for x in range(M_BIT)]
     # initialize predecessor
     self._predecessor = None
@@ -39,8 +29,7 @@ class Node(object):
     self._finger = None
     self._leave = False
 
-    # self._remote.addToNetwork(self._id, self)
-    self.start_rpc_server()
+    self._remote.addToNetwork(self._id, self)
 
     # join the DHT
     self.join(remote_address)
@@ -51,23 +40,6 @@ class Node(object):
   def address(self):
     return self._address.__str__()
 
-  # return RPC client connecting to the node specified by address
-  def getRemoteNodeByIP(self, address):
-    # check if already the corresponding client has been created
-    ip, port = address.__addr__()
-    client_addr = '%s:%d' % (ip, port)
-    print('-----------------------------')
-    print(ip, port)
-    if client_addr not in self.remote_clients:
-      self.remote_clients[client_addr] = util.create_rpc_client(ip, port)
-
-    return self.remote_clients[client_addr]
-
-  def start_rpc_server(self):
-    # Remote2
-    self.rpc_server = Rpc(self)
-    self.rpc_server.startServer()
-
   # node leave
   def leave(self):
     self._leave = True
@@ -77,7 +49,7 @@ class Node(object):
       f = open("/tmp/chord.log", "a+")
       f.write(str(self.id()) + " : " +  info + "\n")
       f.close()
-    #   print(str(self.id()) + " : " +  info)
+      print(str(self.id()) + " : " +  info)
 
   # return true if node does not leave, i.e. still in the Chord ring
   def ping(self):
@@ -97,14 +69,6 @@ class Node(object):
       # 1) add to a node `n`, n.find_successor(`to_be_added`)
       start = (self.id() + (2 ** 0)) % NUM_SLOTS
       remote_node = self._remote.getRemoteNode(remote_address)
-
-      print('-----------')
-      try:
-        test_remote_node = self.getRemoteNodeByIP(remote_address)
-        test_remote_node.ping()
-      except:
-        print('Could not connect')
-
       successor = remote_node.find_successor(start)
       self._finger[0] = FingerEntry(start, successor)
       # 2) point `to_be_added`’s `successor` to the node found
@@ -187,14 +151,14 @@ class Node(object):
 
   def successor(self):
     successor = self._successor
-    # self.log('current successor %b' % self._successor.ping())
+    print('current successor', self._successor.ping())
 
     if not successor.ping():
       for x in range(1, len(self._successors)):
         if self._successors[x].ping():
           successor = self._successors[x]
 
-    # self.log('current successor %d' % successor.id())
+    print('current successor', successor.id())
 
     return successor
 

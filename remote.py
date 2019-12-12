@@ -1,18 +1,13 @@
-import threading
-
 from address import Address
 from node import Node
 from env import NUM_SLOTS
 
-# from handler import RemoteConnection2, remoteConnection2Start
+from thrift_.handler import RemoteConnection2
 
 # class to simulate RPC call, call any remote node other than local one
 class RemoteConnection(object):
   """docstring for Remote"""
   def __init__(self, address):
-    # initialize RPC (RemoteConnect2)
-    # threading.Thread(target=remoteConnection2Start)
-
     # ip addresses
     self._address = address
     self._base_address = address[0]

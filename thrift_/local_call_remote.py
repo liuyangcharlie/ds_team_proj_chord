@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-# import glob
+import glob
 sys.path.append('gen-py')
 #sys.path.insert(0, glob.glob('../../lib/py/build/lib*')[0])
 

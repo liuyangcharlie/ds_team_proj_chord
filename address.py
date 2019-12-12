@@ -5,7 +5,7 @@ from env import NUM_SLOTS
 def inrange(c, a, b):
   a = a % NUM_SLOTS
   b = b % NUM_SLOTS
-#   print('inrange: ', c, a, b)
+  print('inrange: ', c, a, b)
 #   if a == b:
 #     return c == a
   if a < b:
@@ -14,7 +14,7 @@ def inrange(c, a, b):
   return a < c or c < b
 
 class Address(object):
-  def __init__(self, ip, port=9090):
+  def __init__(self, ip, port=9999):
     self.ip = ip
     self.port = int(port)
 
@@ -30,6 +30,3 @@ class Address(object):
 
   def __str__(self):
     return "[\"%s\", %s]" % (self.ip, self.port)
-
-  def __addr__(self):
-    return self.ip, self.port
