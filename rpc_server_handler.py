@@ -10,7 +10,6 @@ from address import Address
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 sys.path.append(dir_path + '/gen-py')
-print('sys.path: ', sys.path)
 
 from serv import Remote
 #from tutorial.ttypes import InvalidOperation, Operation
@@ -19,16 +18,17 @@ from serv import Remote
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+from thrift.protocol import TBinaryProtocol, TJSONProtocol
 from thrift.server import TServer
 
 
 class Rpc(object):
     def __init__(self, node):
         self.log = {}
+        self.node = node
 
-    def ping(self):
-        print('ping()ping()ping()ping()ping()ping()ping()')
+    # def ping(self):
+    #     print('ping()ping()ping()ping()ping()ping()ping()')
 
     # def add(self, n1, n2):
     #     print('add(%d,%d)' % (n1, n2))
@@ -49,18 +49,19 @@ class Rpc(object):
     #     return node
 
     def startServer(self):
-        handler = self
+        handler = self.node
         processor = Remote.Processor(handler)
         transport = TSocket.TServerSocket(host="0.0.0.0", port=9090)
         tfactory = TTransport.TBufferedTransportFactory()
         pfactory = TBinaryProtocol.TBinaryProtocolFactory()
+        # pfactory = TJSONProtocol.TJSONProtocolFactory()
 
         # You could do one of these for a multithreaded server
-        # server = TServer.TThreadedServer(
-        #        processor, transport, tfactory, pfactory)
-        server = TServer.TThreadPoolServer(
-                processor, transport, tfactory, pfactory)
+        server = TServer.TThreadedServer(
+               processor, transport, tfactory, pfactory)
+        # server = TServer.TThreadPoolServer(
+        #         processor, transport, tfactory, pfactory)
 
         print('Starting the server...')
-        threading.Thread(target=server.serve)
+        threading.Thread(target=server.serve).start()
         print('done.')

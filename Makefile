@@ -8,6 +8,5 @@ start_docker:
 
 # compile thrift files
 compile:
-	cd ./thrift
 	rm -rf ./gen-py
 	thrift -r --gen py *.thrift

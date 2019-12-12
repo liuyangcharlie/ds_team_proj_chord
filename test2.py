@@ -1,4 +1,7 @@
 #!/bin/python
+
+import socket
+
 from node import Node
 from remote import RemoteConnection
 from address import Address
@@ -9,8 +12,10 @@ m = M_BIT
 # a list of docker containers' ip address
 address = ["172.17.0.2", "172.17.0.3"]
 
+local_ip = socket.gethostbyname(socket.gethostname())
+
 # ring = RemoteConnection(address)
-node = Node(Address(address[0]))
+node = Node(Address(address[1]), Address(address[0]))
 
 # ring.addNode("127.0.0.5", "127.0.0.1")
 
