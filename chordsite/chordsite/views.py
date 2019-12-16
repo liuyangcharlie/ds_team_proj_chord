@@ -10,33 +10,29 @@ from .server import ring
 def index(request):
     return render(request, 'index.html')
 
-def creat_ring(request):
+def create_ring(request):
     global ring
     ring = server.create_ring()
     response = JsonResponse({'error': None})
     return response
-    # return render(request, 'index.html')
 
 def print_ring(request):
-    # log 
+    # log
     server.print_ring()
     response = JsonResponse({'error': None})
     return response
-    # return render(request, 'index.html')
 
 def get_all_finger(request):
     global ring
     rs= server.get_all_finger()
     response = JsonResponse({'error': None, 'shape': rs, 'm': M_BIT})
     return response
-    # return render(request, 'index.html')
 
 def add_node(request):
     ip = request.GET.get('ip')
     rs = server.add_node(ip)
     response = JsonResponse({'error': None, 'shape': rs})
     return response
-    # return render(request, 'index.html')
 
 def lookup(request):
     key = request.GET.get('key')
@@ -54,9 +50,9 @@ def remove_node(request):
 class Chord(APIView):
     # initialize
     def get(self, request, *args, **kwargs):
-        creat_ring(request)
+        create_ring(request)
         print_ring(request)
         return index(request)
-    
+
     # def creat_chord(self, request):
     #     return creatring(request)

@@ -21,9 +21,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('', Chord.as_view()),
     path('admin/', admin.site.urls),
-    path('index/', Chord.as_view()),
-    path('create_ring/', views.creat_ring),
+    path('create_ring/', views.create_ring),
     path('get_all_finger/', views.get_all_finger),
     path('add_node/', views.add_node),
     path('lookup/', views.lookup),
