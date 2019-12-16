@@ -10,4 +10,4 @@ echo $ip_addr >> "$working_dir/node_addr"
 
 cd $working_dir
 echo `pwd`
-python3 ./manage.py runserver
+python3 ./manage.py runserver 0.0.0.0:8080
