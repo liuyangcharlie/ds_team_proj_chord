@@ -7,9 +7,11 @@ from chordsite.env import M_BIT
 from chordsite.server import head
 from chordsite import server
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    return render(request, os.path.abspath(BASE_DIR + '/web/index.html'))
 
 def create_ring(request):
     global head
@@ -51,8 +53,8 @@ def remove_node(request):
 class Chord(APIView):
     # initialize
     def get(self, request, *args, **kwargs):
-        create_ring(request)
-        print_ring(request)
+        # create_ring(request)
+        # print_ring(request)
         return index(request)
 
     # def creat_chord(self, request):
