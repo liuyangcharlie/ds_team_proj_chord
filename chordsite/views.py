@@ -4,15 +4,16 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from chordsite.env import M_BIT
-from chordsite.server import ring
+from chordsite.server import head
+from chordsite import server
 
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
 
 def create_ring(request):
-    global ring
-    ring = server.create_ring()
+    global head
+    head = server.create_ring()
     response = JsonResponse({'error': None})
     return response
 
@@ -23,7 +24,7 @@ def print_ring(request):
     return response
 
 def get_all_finger(request):
-    global ring
+    global head
     rs= server.get_all_finger()
     response = JsonResponse({'error': None, 'shape': rs, 'm': M_BIT})
     return response

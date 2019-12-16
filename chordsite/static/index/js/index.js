@@ -3,11 +3,17 @@ const $tip = $('#tip');
 
 let fingers;
 
-$tip.text('Creating Chord ring...');
-$.get('/create_ring/', function (data) {
-    return data
-}).done(function (data) {
-    startRender()
+// $tip.text('Creating Chord ring...');
+// $.get('/create_ring/', function (data) {
+//     return data
+// }).done(function (data) {
+//     run(data)
+// })
+
+run();
+
+function run() {
+    startRender();
 
     $('#lookup').on('click', (e) => {
         const key = $('#lookup_key').val();
@@ -49,14 +55,14 @@ $.get('/create_ring/', function (data) {
             $tip.text(`node ${id} leaves`)
         })
     })
-})
+}
 
 function render(data) {
     fingers = data;
     const numOfLot = Math.pow(2, data.m || 3);
     const lots = [];
     const shape = fingers.shape
-    
+
     for(let i = 0; i < numOfLot; i++) {
         const dot = $(`<div ${shape[i] != null ? 'class="active"' : ''} node_id=${i}>
             <span style="color: red">${i}</span>
