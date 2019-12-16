@@ -5,15 +5,15 @@ import math
 import threading
 import rpyc
 
-from env import *
-from address import inrange
-from finger_entry import FingerEntry
-from rpc_server import RPC
-from rpc_client import RPCClient
+
+from chordsite.env import *
+from chordsite.address import inrange
+from chordsite.finger_entry import FingerEntry
+# from rpc_server import RPC
+# from rpc_client import RPCClient
 from rpyc.utils.server import ThreadedServer
 
 # class representing a local peer
-
 
 # class Node(object):
 class Node(rpyc.Service):

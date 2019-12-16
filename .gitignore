@@ -105,3 +105,4 @@ venv.bak/
 
 # thrift
 gen-*
+.DS_Store

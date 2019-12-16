@@ -4,7 +4,7 @@ const $tip = $('#tip');
 let fingers;
 
 $tip.text('Creating Chord ring...');
-$.get('/create_ring', function (data) {
+$.get('/create_ring/', function (data) {
     return data
 }).done(function (data) {
     startRender()
@@ -21,7 +21,7 @@ $.get('/create_ring', function (data) {
             alert('That slot has no node');
             return
         }
-        $.get(`/lookup?key=${key}&id=${onNode}`, function (data) {
+        $.get(`/lookup/?key=${key}&id=${onNode}`, function (data) {
             alert(`Key found at Node ${data.target}`);
         })
     })
@@ -32,7 +32,7 @@ $.get('/create_ring', function (data) {
             return
         }
 
-        $.get(`/add_node?ip=${ip}`, (data) => {
+        $.get(`/add_node/?ip=${ip}`, (data) => {
             render(data);
             $tip.text(`node ${ip} added`)
         });
@@ -44,7 +44,7 @@ $.get('/create_ring', function (data) {
             alert('Please input the right node id');
         }
 
-        $.get(`/remove_node?id=${id}`, (data) => {
+        $.get(`/remove_node/?id=${id}`, (data) => {
             render(data);
             $tip.text(`node ${id} leaves`)
         })
@@ -108,7 +108,7 @@ function validateIp(ipaddress) {
 
 function startRender() {
     setInterval(() => {
-        $.get('/get_all_finger', function (data) {
+        $.get('/get_all_finger/', function (data) {
             $tip.text('');
             render(data);
         })

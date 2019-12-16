@@ -1,5 +1,5 @@
 # import hashlib
-from env import NUM_SLOTS
+from chordsite.env import NUM_SLOTS
 
 # Helper function to determine if a key falls within a range
 def inrange(c, a, b):

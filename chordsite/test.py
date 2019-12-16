@@ -1,4 +1,10 @@
 #!/bin/python
+import os
+import sys
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(dir_path + '/chordsite')
+
 from node import Node
 from address import Address
 from env import *

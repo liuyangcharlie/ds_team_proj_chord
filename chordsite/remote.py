@@ -1,8 +1,6 @@
-from address import Address
-from node import Node
-from env import NUM_SLOTS
-
-from thrift_.handler import RemoteConnection2
+from .address import Address
+from .node import Node
+from .env import NUM_SLOTS
 
 # class to simulate RPC call, call any remote node other than local one
 class RemoteConnection(object):
