@@ -4,9 +4,10 @@
 # This script is used to initialize the node after docker container starts.
 ###########
 
-ip_addr=`hostname -i`
+
 working_dir="/home/c/ds_team_proj_chord_dev"
 
+ip_addr=`hostname -i`
 echo $ip_addr >> "$working_dir/node_addr"
 
 cd $working_dir

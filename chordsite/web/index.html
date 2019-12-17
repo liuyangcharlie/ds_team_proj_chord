@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'index/css/jquery-ui.css' %}">
 </head>
 <body>
-    <div class="header">
+    <!-- <div class="header">
         <fieldset class="fieldset">
             <legend>Chord command</legend>
 
@@ -21,7 +21,6 @@
             <br/>
 
             <input type="text" id="add_node_ip" name="Add Node" placeholder="add a node by ip">
-            <!-- <label for="add_node">Add Node</label> -->
             <button id="add_node">Add Node</button>
             <br/>
 
@@ -36,10 +35,12 @@
                 Hover on a node to view details
             </div>
         </fieldset>
-        
+
         <div id="tip"></div>
-    </div>
+    </div> -->
+
     <div id="container">
+        Loading...
         <div class="circle-container"></div>
     </div>
     <script src="{% static 'index/js/jquery-3.4.1.min.js' %}"
@@ -49,6 +50,7 @@
       src="{% static 'index/js/jquery-ui.min.js' %}"
       integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
       crossorigin="anonymous"></script>
+    <script src="{% static 'index/js/echarts-en.min.js' %}"></script>
     <script src="{% static 'index/js/index.js' %}"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ let fingers;
 // })
 
 // run();
+startRender();
 
 function run() {
     startRender();
@@ -104,6 +105,131 @@ function render(data) {
     $container.html(lots)
 }
 
+function renderFingerTable(finger) {
+    const lines = [];
+
+    for (let i = 0; i < finger.length; i++) {
+        let line = `<div>start: ${finger[i].start}, node: ${finger[i].node}</div>`
+        lines.push(line)
+    }
+
+    return `<div>Finger table:  ${lines.join('')}</div>`
+}
+
+function renderGraph(data) {
+    data = data.shape
+    // data.finger = JSON.parse
+    if (data.length == 0) {
+        return
+    }
+
+    const myChart = echarts.init($('#container')[0]);
+
+    const formatted = [];
+    var edges = [];
+
+    for (let i = 0; i < data.length; i++) {
+        // ugly due to unknown python list not searializable
+        data[i].finger = eval(data[i].finger)
+        console.log(data[i].finger)
+
+        formatted.push({
+            id: data[i].id,
+            tooltip: renderFingerTable(data[i].finger),
+            name: data[i].ip,
+        })
+
+        if (i != 0) {
+            edges.push({
+                source: 0,
+                target: i
+            })
+        }
+    }
+
+    edges.push({
+        source: data.length - 1,
+        target: 0
+    })
+
+    // var data = [{
+    //     id: '0',
+    //     tooltip: 'jjjjjjj',
+    //     name: 'test',
+    // }];
+
+
+    // option = {
+    //     tooltip: {},
+    //     series: [{
+    //         type: 'graph',
+    //         layout: 'force',
+    //         animation: false,
+    //         data: data,
+    //         force: {
+    //             // initLayout: 'circular'
+    //             // gravity: 0
+    //             repulsion: 100,
+    //             edgeLength: 20
+    //         },
+    //         links: edges
+    //     }]
+    // };
+
+    // data.push({
+    //     id: 1,
+    //     tooltip: '2333',
+    // });
+
+    // data.push({
+    //     id: 2,
+    //     tooltip: '444',
+    // });
+
+    // edges.push({
+    //     source: 0,
+    //     target: 1
+    // });
+    // edges.push({
+    //     source: 0,
+    //     target: 2
+    // });
+    console.log(edges)
+    myChart.setOption({
+        tooltip: {},
+        series: [{
+            symbolSize: 30,
+            force: {
+                repulsion: 1000,
+            },
+            type: 'graph',
+            layout: 'force',
+            roam: true,
+            label: {
+                normal: {
+                    show: true
+                }
+            },
+            tooltip: {
+                show: true,
+            },
+            // data: data,
+            data: formatted,
+            links: edges,
+            lineStyle: {
+                normal: {
+                    // opacity: 0.9,
+                    width: 5,
+                    // curveness: 0
+                }
+            }
+        }]
+    });
+
+    // console.log('nodes: ' + data.length);
+    // console.log('links: ' + data.length);
+}
+
 function validateIp(ipaddress) {
     if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {
         return (true)
@@ -116,7 +242,9 @@ function startRender() {
     setInterval(() => {
         $.get('/get_all_finger/', function (data) {
             $tip.text('');
-            render(data);
+            // render(data);
+
+            renderGraph(data)
         })
     }, 1000)
 }

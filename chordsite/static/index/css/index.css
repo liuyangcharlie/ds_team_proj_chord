@@ -26,7 +26,7 @@ body {
     flex: 7;
 }
 
-.circle-container {
+/* .circle-container {
     position: relative;
     width: 33em;
     height: 33em;
@@ -35,7 +35,7 @@ body {
     list-style: none;
     margin: 5em auto 0;
     border: solid 5px tomato;
-  }
+  } */
   .circle-container > * {
     display: block;
     position: absolute;
@@ -70,13 +70,13 @@ body {
     transform: rotate(315deg) translate(16.5em) rotate(-315deg);
   } */
   .circle-container div {
-    display: block;
+    /* display: block;
     max-width: 100%;
     border-radius: 50%;
     filter: grayscale(100%);
     border: solid 2px tomato;
     transition: 0.15s;
-    background-color: black;
+    background-color: black; */
   }
 
   .circle-container div.active {

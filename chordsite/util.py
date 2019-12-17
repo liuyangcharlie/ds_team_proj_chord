@@ -30,11 +30,26 @@ def ringShape(head):
     for ip in ip_arr:
         print('local: ', local, 'ip: ', ip, 'ip == local: ', ip == local)
         if ip == local:
-            s.append(head.node_id())
+            s.append({
+                'id': head.node_id(),
+                'ip': head.address(),
+                'finger': head.get_finger(),
+            })
         else:
-            n = rpyc.connect(ip, 18861).root
-            s.append(n.node_id())
+            n = None
+            try:
+                n = rpyc.connect(ip, 18861).root
+            except:
+                pass
+            if n is not None:
+                s.append({
+                    'id': n.node_id(),
+                    'ip': n.address(),
+                    'finger': n.get_finger(),
+                })
 
     f.close()
+
+    print('type(s): ', type(s), s)
 
     return s

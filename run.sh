@@ -9,12 +9,14 @@
 rm ./node_addr
 
 # loop to start docker container
-# a ip addr list
-# docker run --ip=$(ip) --publish=$(port):8080 --name=$(name) -it -v ~/Documents/GWU/Code/distributed_system:/home/c/ds_team_proj_chord_dev vibrant_elbakyan/chord
-make start_docker name="node4" port="8081"
+port=8080
+for i in {3..8}
+do
+    echo "starting node$i..."
+    make start_docker name="node$i" port="`expr $port + $i`"
+done
 
-# write ip to a shared file
-# DONE in docker container
+echo "nodes started"
 
 # start server, server reads shared file
 # python3 ./manage.py runserver

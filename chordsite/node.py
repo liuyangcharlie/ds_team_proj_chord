@@ -78,9 +78,11 @@ class Node(rpyc.Service):
         self._thread.start()
         print('RPC server started...')
 
-
     def address(self):
-        return self._address.__str__()
+        return self._address
+
+    def exposed_address(self):
+        return self._address
 
 
     # node leave
@@ -321,7 +323,6 @@ class Node(rpyc.Service):
 
         return self
 
-
     # used for network visualization application
     def get_finger(self):
         finger = []
@@ -332,7 +333,11 @@ class Node(rpyc.Service):
             else:
                 finger.append({})
 
-        return finger
+        return str(finger)
+
+    # used for network visualization application
+    def exposed_get_finger(self):
+        return self.get_finger()
 
 
     def update_finger(self, successor, index):
