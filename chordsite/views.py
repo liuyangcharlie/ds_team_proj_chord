@@ -4,8 +4,12 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from chordsite.env import M_BIT
-from chordsite.server import head
+# from chordsite.server import head
 from chordsite import server
+from chordsite.node import Node
+from chordsite.util import local_ip
+
+global head
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,7 +31,7 @@ def print_ring(request):
 
 def get_all_finger(request):
     global head
-    rs= server.get_all_finger()
+    rs= server.get_all_finger(head)
     response = JsonResponse({'error': None, 'shape': rs, 'm': M_BIT})
     return response
 
@@ -49,6 +53,10 @@ def remove_node(request):
     s = server.remove_node(id)
     response = JsonResponse({'error': None, 'shape': s})
     return response
+
+def set_head(n):
+    global head
+    head = n
 
 class Chord(APIView):
     # initialize

@@ -7,10 +7,10 @@ let fingers;
 // $.get('/create_ring/', function (data) {
 //     return data
 // }).done(function (data) {
-//     run(data)
+//     run()
 // })
 
-run();
+// run();
 
 function run() {
     startRender();

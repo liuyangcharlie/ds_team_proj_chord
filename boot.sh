@@ -6,6 +6,7 @@
 
 ip_addr=`hostname -i`
 working_dir="/home/c/ds_team_proj_chord_dev"
+
 echo $ip_addr >> "$working_dir/node_addr"
 
 cd $working_dir

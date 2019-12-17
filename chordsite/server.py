@@ -5,24 +5,24 @@ from chordsite.address import Address
 from chordsite.env import M_BIT
 
 m = M_BIT
-address = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
+# address = ["127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4"]
+global head
 head = None
 
 
 def create_ring():
     global head
-    head = RemoteConnection(address)
+    # head = Node(address[0])
     return head
 
 def print_ring():
     global head
     head.printNodes()
 
-def get_all_finger():
-    global head
-    # TODO: replace with new method
-    # rs = head.ringShape()
+def get_all_finger(head):
+    # global head
     rs = util.ringShape(head)
+    print('rs: ', rs)
     return rs
 
 def add_node(ip):
