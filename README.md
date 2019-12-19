@@ -3,7 +3,5 @@
 ## About
 implementation on chord leveraging docker to implement RPC calls, with an interactive GUI demo  
 
-aim to ship it on AWS
-
 ## Reference
 - [Chord: A Scalable Peer-to-peer Lookup Service for Internet Applications](https://pdos.csail.mit.edu/papers/chord:sigcomm01/chord_sigcomm.pdf)
