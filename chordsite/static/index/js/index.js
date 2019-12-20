@@ -105,7 +105,7 @@ function render(data) {
     $container.html(lots)
 }
 
-function renderFingerTable(finger) {
+function renderFingerTable(finger, ip) {
     const lines = [];
 
     for (let i = 0; i < finger.length; i++) {
@@ -113,7 +113,7 @@ function renderFingerTable(finger) {
         lines.push(line)
     }
 
-    return `<div>Finger table:  ${lines.join('')}</div>`
+    return `<div><b>Finger table of ${ip}</b>:  ${lines.join('')}</div>`
 }
 
 function renderGraph(data) {
@@ -131,76 +131,35 @@ function renderGraph(data) {
     for (let i = 0; i < data.length; i++) {
         // ugly due to unknown python list not searializable
         data[i].finger = eval(data[i].finger)
-        console.log(data[i].finger)
 
         formatted.push({
             id: data[i].id,
-            tooltip: renderFingerTable(data[i].finger),
-            name: data[i].ip,
+            tooltip: renderFingerTable(data[i].finger, data[i].ip),
+            name: data[i].id,
         })
 
-        if (i != 0) {
-            edges.push({
-                source: 0,
-                target: i
-            })
+        const succID = data[i].successor;
+
+        for (let j = 0; j < data.length; j++) {
+            if (succID == data[j].id) {
+                edges.push({
+                    source: i,
+                    target: j
+                });
+
+                console.log(edges)
+            }
         }
     }
 
-    edges.push({
-        source: data.length - 1,
-        target: 0
-    })
-
-    // var data = [{
-    //     id: '0',
-    //     tooltip: 'jjjjjjj',
-    //     name: 'test',
-    // }];
-
-
-    // option = {
-    //     tooltip: {},
-    //     series: [{
-    //         type: 'graph',
-    //         layout: 'force',
-    //         animation: false,
-    //         data: data,
-    //         force: {
-    //             // initLayout: 'circular'
-    //             // gravity: 0
-    //             repulsion: 100,
-    //             edgeLength: 20
-    //         },
-    //         links: edges
-    //     }]
-    // };
-
-    // data.push({
-    //     id: 1,
-    //     tooltip: '2333',
-    // });
-
-    // data.push({
-    //     id: 2,
-    //     tooltip: '444',
-    // });
-
-    // edges.push({
-    //     source: 0,
-    //     target: 1
-    // });
-    // edges.push({
-    //     source: 0,
-    //     target: 2
-    // });
-    console.log(edges)
     myChart.setOption({
         tooltip: {},
         series: [{
-            symbolSize: 30,
+            symbolSize: 20,
+            edgeSymbol: ['arrow'],
             force: {
                 repulsion: 1000,
+                edgeLength: 100,
             },
             type: 'graph',
             layout: 'force',
@@ -218,9 +177,10 @@ function renderGraph(data) {
             links: edges,
             lineStyle: {
                 normal: {
-                    // opacity: 0.9,
-                    width: 5,
-                    // curveness: 0
+                    opacity: 0.9,
+                    width: 2,
+                    curveness: 0.2,
+                    type: 'dotted',
                 }
             }
         }]
