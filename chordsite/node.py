@@ -252,7 +252,11 @@ class Node(rpyc.Service):
     def exposed_node_id(self, offset=0):
         return self._id
 
-
+    def exposed_file_recv(self, content):
+        return content
+    
+    def exposed_key_send(self, key):
+        return key
 
     # for successor other than the node itself, `successor` returns the Netrefs instance of a remote node
     def successor(self):
