@@ -41,6 +41,8 @@ class Node(rpyc.Service):
 
         # list of successors is to prevent lookup failure
         self._successors = [None for x in range(M_BIT)]
+        self._predecessor_id = _id
+        self._successor_id = _id
 
         # initialize predecessor
         self._predecessor = None
@@ -269,7 +271,17 @@ class Node(rpyc.Service):
         return successor
 
     def exposed_successor(self):
-        return self.successor()
+        successor = self._successor
+        print('current successor', self._successor.ping())
+
+        if not successor.ping():
+            for x in range(1, len(self._successors)):
+                if self._successors[x].ping():
+                    successor = self._successors[x]
+
+        print('current successor', successor.node_id())
+
+        return successor
 
 
     # for predecessor other than the node itself, `predecessor` returns the Netrefs instance of a remote node
@@ -279,11 +291,19 @@ class Node(rpyc.Service):
     def exposed_predecessor(self):
         return self._predecessor
 
+    def get_succ_pred_id(self):
+        print('get_succ_pred_id: ', self._successor.node_id(), self._predecessor_id)
+        return (self._successor.node_id(), self._predecessor_id)
+
+    def exposed_get_succ_pred_id(self):
+        print('exposed_get_succ_pred_id: ', self._successor.node_id(), self._predecessor_id)
+        return (self._successor.node_id(), self._predecessor_id)
+
     # set predecessor
     def set_predecessor(self, node):
         print('---------set_predecessor------------')
-        print(node)
-        self._predecessor = node
+        print(node.node_id())
+        self._predecessor_id = node.node_id()
 
 
     # TODO: one thing to note is this may return a Netrefs instance of a remote node, rather than a Node instance

@@ -30,10 +30,14 @@ def ringShape(head):
     for ip in ip_arr:
         print('local: ', local, 'ip: ', ip, 'ip == local: ', ip == local)
         if ip == local:
+            succ_id, pred_id = head.get_succ_pred_id()
+            print('1 head.get_succ_pred_id: ', succ_id, pred_id)
             s.append({
                 'id': head.node_id(),
                 'ip': head.address(),
                 'finger': head.get_finger(),
+                'successor': succ_id,
+                'predecessor': pred_id,
             })
         else:
             n = None
@@ -42,10 +46,14 @@ def ringShape(head):
             except:
                 pass
             if n is not None:
+                succ_id, pred_id = n.get_succ_pred_id()
+                print('2 head.get_succ_pred_id: ', succ_id, pred_id)
                 s.append({
                     'id': n.node_id(),
                     'ip': n.address(),
                     'finger': n.get_finger(),
+                    'successor': succ_id,
+                    'predecessor': pred_id,
                 })
 
     f.close()
