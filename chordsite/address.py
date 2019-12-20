@@ -1,4 +1,4 @@
-# import hashlib
+import hashlib
 from chordsite.env import NUM_SLOTS
 
 # Helper function to determine if a key falls within a range
@@ -19,7 +19,8 @@ class Address(object):
     self.port = int(port)
 
   def __hash__(self):
-    h = hash(("%s:%s" % (self.ip, self.port)).encode()) % NUM_SLOTS
+    # h = hash(("%s:%s" % (self.ip, self.port)).encode()) % NUM_SLOTS
+    h = hashlib.md5(("%s:%s" % (self.ip, self.port)).encode()) % NUM_SLOTS
     return h
 
   def __cmp__(self, other):
