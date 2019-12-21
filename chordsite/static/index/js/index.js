@@ -11,7 +11,54 @@ let fingers;
 // })
 
 // run();
+const simplemde = new SimpleMDE({
+    element: $('#text-area')[0],
+});
+$('#text').hide()
 startRender();
+
+function renderFilelist(data) {
+    const list = data.content;
+    const textArea = $('#text-area')
+    textArea.hide()
+    let filelist = '';
+    for (let i = 0; i < list.length; i++) {
+        filelist += `<div class="f"><a href="#">${list[i]}</a></div>`
+    }
+    const fileContainer = $('#file-tree');
+    fileContainer.html(filelist)
+
+    let filename = '';
+    fileContainer.on('click', '.f', (e) => {
+        filename = e.currentTarget.innerText
+        $.get(`/get_file/?filename=${filename}`, function(data) {
+            console.log(data)
+            simplemde.value(data.content);
+        })
+        $('#text').show()
+    })
+
+    $('#file').on('click', '#cancel', (e) => {
+        $('#text').hide()
+    })
+
+    $('#file').on('click', '#save', (e) => {
+        const content = simplemde.value();
+        const param = {
+            content: content,
+            filename: filename
+        }
+
+        $.get(`/save_file/?${$.param(param)}`, function(data) {
+            if (!data.error) {
+                $('#tip').html('Save succeeded')
+            } else {
+                $('#tip').html('Save failed, try again later')
+            }
+            $('#text').hide()
+        })
+    })
+}
 
 function run() {
     startRender();
@@ -147,7 +194,7 @@ function renderGraph(data) {
                     target: j
                 });
 
-                console.log(edges)
+                // console.log(edges)
             }
         }
     }
@@ -207,4 +254,9 @@ function startRender() {
             renderGraph(data)
         })
     }, 1000)
+    $.get('/list_dir/', function (data) {
+        $tip.text('');
+
+        renderFilelist(data)
+    })
 }

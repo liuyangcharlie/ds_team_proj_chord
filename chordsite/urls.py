@@ -38,6 +38,9 @@ urlpatterns = [
     path('add_node/', views.add_node),
     path('lookup/', views.lookup),
     path('remove_node/', views.remove_node),
+    path('list_dir/', views.list_dir),
+    path('save_file/', views.save_file),
+    path('get_file/', views.get_file),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

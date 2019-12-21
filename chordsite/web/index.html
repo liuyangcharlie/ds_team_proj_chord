@@ -8,6 +8,7 @@
     <title>Chord Demo</title>
     <link rel="stylesheet" type="text/css" href="{% static 'index/css/index.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'index/css/jquery-ui.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'index/css/simplemde.min.css' %}">
 </head>
 <body>
     <!-- <div class="header">
@@ -43,7 +44,15 @@
         Loading...
         <div class="circle-container"></div>
     </div>
-    <div id="file">Placeholder for file system</div>
+    <div id="file">
+        file system <span id="tip"></span>
+        <button id="cancel">Cancel</button>
+        <button id="save">Save</button>
+        <div id="file-tree"></div>
+        <div id="text">
+            <textarea id="text-area"></textarea>
+        </div>
+    </div>
     <script src="{% static 'index/js/jquery-3.4.1.min.js' %}"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"></script>
@@ -52,6 +61,7 @@
       integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
       crossorigin="anonymous"></script>
     <script src="{% static 'index/js/echarts-en.min.js' %}"></script>
+    <script src="{% static 'index/js/simplemde.min.js' %}"></script>
     <script src="{% static 'index/js/index.js' %}"></script>
 </body>
 </html>
