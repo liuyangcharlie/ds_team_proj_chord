@@ -49,6 +49,9 @@ class Node(rpyc.Service):
         self._finger = None
         self._leave = False
 
+        # file directory
+        self._file_directory = []
+
         # means that node in on the ring
         # TODO: to be removed when using RPC, DEPRECATED
         # self._remote.addToNetwork(self._id, self)
